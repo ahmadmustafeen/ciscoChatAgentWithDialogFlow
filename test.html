@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+    import axios from 'axios'
+    import { KJUR } from 'jsrsasign'
+
+    const creds = require('./CR-file.json')
+
+    export default {
+        name: 'myChatBot',
+        data() {
+            return {
+                token: undefined,
+                tokenInterval: undefined
+            }
+        },
+        created() {
+            // update the tokens every hour
+            this.tokenInterval = setInterval(this.generateToken, 3600000)
+            this.generateToken()
+        },
+        mounted() {
+            this.detectIntent('add buy milk to inbox')
+        },
+        beforeDestroy() {
+            clearInterval(this.tokenInterval)
+        },
+        methods: {
+            generateToken() {
+                // Header
+                const header = {
+                    alg: 'RS256',
+                    typ: 'JWT',
+                    kid: creds.private_key_id
+                }
+
+                // Payload
+                const payload = {
+                    iss: creds.client_email,
+                    sub: creds.client_email,
+                    iat: KJUR.jws.IntDate.get('now'),
+                    exp: KJUR.jws.IntDate.get('now + 1hour'),
+                    aud: 'https://dialogflow.googleapis.com/google.cloud.dialogflow.v2.Sessions'
+                }
+
+                const stringHeader = JSON.stringify(header)
+                const stringPayload = JSON.stringify(payload)
+                this.token = KJUR.jws.JWS.sign('RS256', stringHeader, stringPayload, creds.private_key)
+            },
+            detectIntent(text, languageCode = 'en-US') {
+                if (!this.token) {
+                    // try again
+                    setTimeout(this.detectIntent, 300, text, languageCode)
+                    return
+                }
+
+                // error check for no text, etc.
+
+                const session = 'projects/mychatbot/agent/sessions/6656';
+                axios.defaults.baseURL = 'https://dialogflow.googleapis.com'
+                axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`
+                axios.defaults.headers.post['Content-Type'] = 'application/json'
+
+                axios.post(`/v2beta1/${session}:detectIntent`, {
+                    queryInput: {
+                        text: {
+                            text,
+                            languageCode
+                        }
+                    }
+                }).then(response => console.log(response)).catch(error => console.log(error))
+            }
+        }
+    }
+</script>

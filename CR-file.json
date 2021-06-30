@@ -1,0 +1,12 @@
+{
+    "type": "service_account",
+    "project_id": "cisco-bot-ufmj",
+    "private_key_id": "43aa828183ca8d3171909081766f6ba6dbccd3ba",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDTywLbDL/CsKZ3\nlcPMGPvR96pbkGtABAAiz0SCzHBaBDdfNoL4pODzozL5LqiXKK9QqxOJW1pC0627\nptgpXPwexK0UgDQXTB5YipMofeHqg8A4/h/+HWJBhhuG5qqU/Y/fOyxr29KHY6i1\nJu7X2ytgGGWIUwwzepgoODjl8lbJMw5lbcR7O0nObnHt0029SoYExd0w3SxZ5C4j\nwleexvGjAZY5nnbByrvJdHqbaVgPLaThKzGKjkWm6wElxr+HwYW/I+Nhf39d4kA5\nLjqNX4f5KoAVJwq3xmBYN0jpyCZvFgIPAP/uoJo2PkNWB7Li7BPbB0g0s2kc8mtz\nJ7McnlDLAgMBAAECggEAIdShUaUxMmOuS5bYLk9lVi5F/5dLkm+xJ95M1snaPn7C\n64oVFKudpT1R5JzP4Elm669QERZPDjKq4zks+Tp5qV6IOSibaYdGp6UHCaZGAoRm\nHZR2Psypx8aouf05jVANfb6Bg38bG3ZPWhRsfX1sac6r1UFSxxxTlsUYTZ7OvxeG\n0O6lp7jxMSFf7Bby0cxTLaxt1ubCkA4rlewlHmHwDCCucUc/UDnw5px8coRXGwgR\nXxuEG8DfLGuKd4pUuQVLkkjUSHW6MRUKVlAkI5g+YJVJh/XBKhRDOrZAWZfwqMM5\nlMyPEqgqKXj7X9TEnd01SNJsgd8l7r9vuALxQkPwUQKBgQDuz56hjONL6jYknNLG\nkH0ZI9AhwGYXXcMJenD88NLZDQza6ku7olsIaAQ97c2f3sJEY1dgpUbWyRxIduPx\ndQWBT/LyBHERs8rOKGAUgicu9gicw3jfXAnKZH6IK1GANDXPjVa0z3b+HqkJCz0Y\nZAtBJA2mtyHoVoEyuprbhmlcGwKBgQDjCY1jjgQKzTTwMfwkBNpQNMMfqEFYMJpM\ndWInQFwwAus3nLRG54DKiZ6gG/zvQ22tkTXPtxj4vrVm2ESBeUI7ikn7fiSOSofa\nD6suG6Tga4YZVSVYLMlB/R/1+PzfddmluPDVxb1Rd2dUqJH7FkE0xpvKo8+lb0pQ\nyQQl68rJEQKBgGFppW6Gls0Hq7BBnCTNGYpgtmyeG8baQ02heWdkIM3S6fR+cAgI\n0RNbwqc0UpUs+5eD4keVA5FnlbblcFO1BVrbLuGT+D9dVJPFmnOjJ7KbP6Yagjqy\nQ3ggiBCpguRF59FS+RRmMEa2YQNEZ1aEsKaQu1TPDPDGIIt93N9BM8cTAoGBAIG/\nOsMTLPIzVbaTCkJXV6AQlxYnZLiOhg994csGt+hkMqJEdq4yrOKShUmA1SqzQSG4\n46TCQY4eBrMwku3fK1+1ZxRHgYKjy0FuROiDudTa/fbKNx5N8fI5QyOh2Hmn8usH\nZvL0H35IG5BBCbQRgtAzVGMY/JjRognK5wj42JnRAoGBAMucdYWfB/ft6JMSDywl\nwU4SMpfbzoQrXUMwlm9+ZyRAfvEuHCoqPLEmM1yBom7U60HnQw3uWn5NDU0nKa9/\n2Gs1gw2Xp/1pRECP5i3pLCGKuE0Sufe/W9ZUtJBt1Tt1/1fIBE+MSRUDmf81mkC/\nlNFaFdDDpcnJkrXCcGdEUpbc\n-----END PRIVATE KEY-----\n",
+    "client_email": "nodedialog@cisco-bot-ufmj.iam.gserviceaccount.com",
+    "client_id": "102609843890518923233",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/nodedialog%40cisco-bot-ufmj.iam.gserviceaccount.com"
+}
