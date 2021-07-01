@@ -9,7 +9,16 @@
 </head>
 
 <body>
-    <button onclick="ciscoBubbleChat.showChatWindow()">Start Chat</button>
+    <!-- <button onclick="ciscoBubbleChat.showChatWindow()">Start Chat</button> -->
+    <button onclick="ciscoBubbleChat.showChatWindow({
+            formData: {
+extensionField_ccxqueuetag: 'Chat_Csq3',
+            title: 'sdasdsa',
+            author: 'dsasd'
+            
+            },
+            validationErrorCallback: function(){console.log('error in validating injected data');}
+        })">Click to chat</button>
 </body>
 
 </html>
@@ -150,6 +159,9 @@
     eg:
     <button onclick="ciscoBubbleChat.showChatWindow({
             formData: {
+'extensionField_ccxqueuetag': 'Chat_Csq3',
+            'title': 'sdasdsa',
+            'author': 'dsasd'
                 AnyFieldName1: 'AnyFieldValue1',
                 AnyFieldName2: 'AnyFieldValue2',
                 AnyFieldName3: 'AnyFieldValue3',
@@ -175,9 +187,9 @@
         // var smHost = 'SM2-UCCX.dcloud.cisco.com';
         var widgetId = '3';
 
-        var smHost = '173.38.218.235'
+        var smHost = '198.38.219.40'
         // Modify this flag to false, To disable the chat download transcript option
-        var enableTranscriptDownload = true;
+        var enableTranscriptDownload = false;
 
         //Please change below accesibility messages for your language if reqiured.
         var accesibilityMessageForCloseButton = 'close';
@@ -195,6 +207,7 @@
         var appClass = isMobile() ? 'mobile_bubble_chat' : 'desktop_bubble_chat';
         var appMargin = 15;
         var scheme = 'https://';
+        // var appUrl = scheme + smHost + '/ccp/ui/BubbleChat.html?host=' + smHost + '&wid=' + widgetId;
         var appUrl = scheme + smHost + '/ccp/ui/BubbleChat.html?host=' + smHost + '&wid=' + widgetId;
         var connectivityCheckUrlSecure = scheme + smHost + '/ccp/ui/ConnectivityCheck.html';
         var secureConnectivityCheckTimeout = 2000;
@@ -208,7 +221,10 @@
             'agentTypingText': accesibilityMessageToIndicateAgentTyping,
             'agentSentMessageText': accesibilityMessageToIndicateMessageFromAgent,
             'customerSentMessageText': accesibilityMessageToIndicateCustomerSentMessage,
-            'feedbackRatingIndicationText': accesibilityMessageToSelectRating
+            'feedbackRatingIndicationText': accesibilityMessageToSelectRating,
+            'extensionField_ccxqueuetag': 'Chat_Csq3',
+            'title': 'sdasdsa',
+            'author': 'dsasd'
         };
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -405,11 +421,17 @@
                         }
                     }
                 }
+                const secret_data = {
+                    'csqueuetag': 'Chat_Csq3',
+                    'extensionField_csqueuetag': 'Chat_Csq3',
+                    'title': 'adasdas',
+                    'author': 'adsasd',
+                }
                 console.log(logPrefix + 'Checking secure connectivity to: ' + connectivityCheckUrlSecure);
                 xhrSecureConnectivityCheck.open('HEAD', addNoCacheQueryParam(connectivityCheckUrlSecure), true);
                 xhrSecureConnectivityCheck.timeout = secureConnectivityCheckTimeout;
                 xhrSecureConnectivityCheck.ontimeout = function () { console.log(logPrefix + 'Secure Connectivity check timed out'); }
-                xhrSecureConnectivityCheck.send();
+                xhrSecureConnectivityCheck.send(JSON.stringify(secret_data));
             }
         };
     })();
