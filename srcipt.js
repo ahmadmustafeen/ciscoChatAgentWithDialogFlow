@@ -1,182 +1,172 @@
-<!DOCTYPE html>
-<html lang="en">
+// check if enter is pressed in input field
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
+var inputField = document.getElementById("query");
+inputField.addEventListener("keydown", function (e) {
+    if (e.code === "Enter") {  //checks whether the pressed key is "Enter"
+        onQuerySubmit(inputField.value)
+    }
+});
 
-<body>
-    <!-- <button onclick="ciscoBubbleChat.showChatWindow()">Start Chat</button> -->
-    <button onclick="ciscoBubbleChat.showChatWindow({
-            formData: {
-extensionField_ccxqueuetag: 'Chat_Csq3',
-            title: 'sdasdsa',
-            author: 'dsasd'
+
+
+// open chat button
+const openChat = props => {
+    let id = document.getElementById('chatbox');
+    if(id.style.display==='none'){
+        id.style.display='block';
+        document.getElementById('btn-chat').innerHTML="Close"
+        document.getElementById('query').focus()
+        
+        
+    }
+    else{
+        document.getElementById('chat').innerHTML = ""
+        document.getElementById('btn-chat').innerHTML="Chat"
+        id.style.display ='none'
+    }
+}
+
+
+
+
+// here dialogflow action will be preformed
+const onQuerySubmit = query =>{
+    if(!validateQuery(query)) return false
+    console.log(dialogflowResponse(query))
+}
+
+
+
+
+
+const validateQuery = query => {
+if(!query) {
+    alert("Enter somthing first");
+    return false
+}
+else{
+    return true
+}
+}
+
+
+let oldChat = ""
+
+const dialogflowResponse = query => {
+    
+    // const token = "ya29.a0ARrdaM_89C_m0Eltu6irfn2c_-ForOn0KYmFyZB5WbKG9dzcZWwhEMkpRrDsUE6zx5-t-UPT83QnhJ22EYcKZztfi0AI0OZaWKzTZpdfNIdfrBEf8Ab4-CTtG8kHmmnvQc_uA0yXwYPmfcTrXh0N_vlVze5qWw"
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "https://dialogflow.googleapis.com/v2/projects/cisco-bot-ufmj/agent/sessions/5435:detectIntent");
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("Authorization", "Bearer " + token);
+    var data = {
+        query_input: {
+            text: {
+                text: query,
+                language_code: "en-US"
+            }
+        }
+    };
+    xhr.send(JSON.stringify(data));
+    xhr.onreadystatechange = function () {
+        // if (!xhr.readyState) {
+        //     responseField.innerHTML += `<h1>Token Expired, Generate a new token</h1>`
+        // }
+        if (xhr.readyState === 4) {
+            let QueryResult = JSON.parse(xhr.responseText).queryResult
             
-            },
-            validationErrorCallback: function(){console.log('error in validating injected data');}
-        })">Click to chat</button>
-</body>
+            if (QueryResult.action !== 'input.unknown') {
+                if(QueryResult.fulfillmentText.includes('cisco')){
+                    if (confirm('We will have to connect to our Human Agent in order to respond! Continue?')) {
+                        // Save it!
+                        ciscoBubbleChat.showChatWindow({
+                                formData: {
+                                    previousChat: oldChat,
+                                    recentQuestion:query
+                                }, validationErrorCallback: function () {
+                                    console.log('business specific logic goes here');
+                                }
+                            })
+                            document.getElementById('chat').innerHTML = ""
+                        openChat();
+                      } else {
+                        // Do nothing!
+                        createResponseVisual(query,"Thanks for using this chatbox,write something to ask again!")
+                      }
+                   
+                }
+                oldChat += `USER: ${query} \n BOT: ${QueryResult.fulfillmentText} \n\n`
+                 createResponseVisual(query,QueryResult.fulfillmentText)
+                // all_responses += `QUERY: ${query} \n RESPONSE: ${QueryResult.fulfillmentText} \n\n`
+                // responseField.innerHTML += `<h1 style='color:rgb(100,205,100)'>Agent: ${QueryResult.fulfillmentText}</h1> <br><br>`
+            }
+            else {
+                // alert("We will have to connect to our Human Agent in order to respond! Continue?")
+                if (confirm('We will have to connect to our Human Agent in order to respond! Continue?')) {
+                    // Save it!
+                    ciscoBubbleChat.showChatWindow({
+                            formData: {
+                                previousChat: oldChat,
+                                recentQuestion:query
+                            }, validationErrorCallback: function () {
+                                console.log('business specific logic goes here');
+                            }
+                        })
+                        document.getElementById('chat').innerHTML = ""
+                    openChat();
+                  } else {
+                    // Do nothing!
+                    createResponseVisual(query,"Thanks for using this chatbox,write something to ask again!")
+                  }
+                // responseField.innerHTML += `<h1 style='color:rgb(100,205,100)'>Agent: We Need to Transfer this chat to our chat agent</h1>`
+                // responseField.innerHTML += `<button style='background-color:rgb(100,205,100);width:100px;height:30px' onclick=" ciscoBubbleChat.showChatWindow({
+                //     formData: {
+                //         previousChat: all_responses,currentChat:userQuery,'csq_list':'Initialize chat'}});document.getElementById('response').style.display='none'">Continue</button> <br><br>`
 
-</html>
+                // ciscoBubbleChat.showChatWindow({
+                //     formData: {
+                //         previousChat: all_responses,
+                //     }, validationErrorCallback: function () {
+                //         console.log('business specific logic goes here');
+                //     }
+                // })
+                // responseField.innerHTML += `<h1>Part where cisco is connected</h1>`
 
+            }
 
-<!-- 
-    Add this style tag to the target webpage.
-    Modify only height and width attributes to resize the chat widget.
-    Modify position attributes (bottom, right) to change the widget positioning on the screen.
-    -->
-<style>
-    /*
-        Styles will apply when device(view port) width is >768px
-    */
-    @media (min-device-width : 768px) {
-        .desktop_bubble_chat {
-            height: 410px;
-            max-height: 410px;
-            width: 312px;
-            position: fixed;
-            bottom: 1em;
-            right: 1em;
-            border: none;
-            outline: none;
-            box-sizing: border-box;
-            z-index: 999;
-            overflow: hidden;
-            padding: 0;
         }
-    }
+    };
 
-    /*
-        Styles will apply when device(view port) width is <=768px
-    */
-    @media (max-device-width: 768px) {
-        .desktop_bubble_chat {
-            height: 100%;
-            max-height: 100%;
-            width: 100%;
-            position: fixed;
-            bottom: 0;
-            right: 0;
-            border: none;
-            outline: none;
-            box-sizing: border-box;
-            z-index: 999;
-            overflow: hidden;
-            padding: 0;
-        }
-    }
+}
 
-    /*
-        Styles will apply when available width on window resize is >768px
-    */
-    @media (min-width : 768px) {
-        .desktop_bubble_chat {
-            height: 410px;
-            max-height: 410px;
-            width: 312px;
-            position: fixed;
-            bottom: 1em;
-            right: 1em;
-            border: none;
-            outline: none;
-            box-sizing: border-box;
-            z-index: 999;
-            overflow: hidden;
-            padding: 0;
-        }
-    }
 
-    /*
-        Styles will apply when available width on window resize is <=768px
-    */
-    @media (max-width: 768px) {
-        .desktop_bubble_chat {
-            height: 100%;
-            max-height: 100%;
-            width: 100%;
-            position: fixed;
-            bottom: 0;
-            right: 0;
-            border: none;
-            outline: none;
-            box-sizing: border-box;
-            z-index: 999;
-            overflow: hidden;
-            padding: 0;
-        }
-    }
 
-    /*
-        Styles will apply when isMobile function returns true
-    */
-    .mobile_bubble_chat {
-        height: 100%;
-        max-height: 100%;
-        width: 100%;
-        position: fixed;
-        bottom: 0;
-        right: 0;
-        border: none;
-        outline: none;
-        box-sizing: border-box;
-        z-index: 999;
-        overflow: hidden;
-        padding: 0;
-    }
+const createResponseVisual = (userQuery,botResponse) => {
+let chat = document.getElementById('chat')
+var currentdate = new Date(); 
 
-    /*
-        Style will apply when chat is minimized
-    */
-    .minimized_chat {
-        height: 56px;
-    }
-</style>
+chat.innerHTML += `<div class='response-area' id='${userQuery}${currentdate}'>
+<div class='userQuery'><p>${userQuery}</p></div>
+<div class='botResponse'><p id='${userQuery}${currentdate}response'>...</p></div>
+</div>`
 
-<!-- Add this script tag without any modification to the target webpage
+setTimeout(()=>{
+    document.getElementById(`${userQuery}${currentdate}response`).innerHTML =
+    `${botResponse}`
+},1000)
+document.getElementById(`${userQuery}${currentdate}`).scrollIntoView();
+document.getElementById('query').value=""
 
-    Use the function 'ciscoBubbleChat.showChatWindow() as the event handler for initiating chat.
-    eg: <button onclick="ciscoBubbleChat.showChatWindow()">Start Chat</button>
+}
 
-    Optionally, invisible form data can be submitted, which will be submitted along with the fields customer fills in.
-    Upto 10 fields can be passed. If more than 10 fields are passed, the invisible form data will not be used and
-    the provided error callback will be invoked. For injecting form data, an object should be passed to
-    ciscoBubbleChat.showChatWindow() as an argument. The object should be of the form:
-    {
-        formData: {
-            InjectedField1: 'InjectedValue1',
-            InjectedField2: 'InjectedValue2'
-            ...
-        },
-        validationErrorCallback: function(){console.log('business specific logic goes here');}
-    }
-    The form data can have any string as field name and value. The submitted invisible form data values will be
-    shown in the agent desktop, as well as will be updated in ContextService if the specified fieldset(s) in the widget
-    contains these field names just like the regular visible chat form fields data.
-    eg:
-    <button onclick="ciscoBubbleChat.showChatWindow({
-            formData: {
-'extensionField_ccxqueuetag': 'Chat_Csq3',
-            'title': 'sdasdsa',
-            'author': 'dsasd'
-                AnyFieldName1: 'AnyFieldValue1',
-                AnyFieldName2: 'AnyFieldValue2',
-                AnyFieldName3: 'AnyFieldValue3',
-                AnyFieldName4: 'AnyFieldValue4',
-                AnyFieldName5: 'AnyFieldValue5',
-                AnyFieldName6: 'AnyFieldValue6',
-                AnyFieldName7: 'AnyFieldValue7',
-                AnyFieldName8: 'AnyFieldValue8',
-                AnyFieldName9: 'AnyFieldValue9',
-                AnyFieldName10: 'AnyFieldValue10'
-            },
-            validationErrorCallback: function(){console.log('error in validating injected data');}
-        })">Click to chat</button>
--->
-<script type="application/javascript">
+
+
+
+// open cisco
+
+
     // To detect if the chat is being launched on mobile device
     function isMobile() {
         var userAgent = navigator.userAgent || navigator.vendor || window.opera;
@@ -185,9 +175,10 @@ extensionField_ccxqueuetag: 'Chat_Csq3',
 
     var ciscoBubbleChat = (function () {
         // var smHost = 'SM2-UCCX.dcloud.cisco.com';
+        // var smHost = '64.100.10.15';
+        // var smHost = '173.38.218.235'
+        var smHost ='173.38.219.40'
         var widgetId = '4';
-
-        var smHost = '173.38.219.40'
         // Modify this flag to false, To disable the chat download transcript option
         var enableTranscriptDownload = false;
 
@@ -207,8 +198,7 @@ extensionField_ccxqueuetag: 'Chat_Csq3',
         var appClass = isMobile() ? 'mobile_bubble_chat' : 'desktop_bubble_chat';
         var appMargin = 15;
         var scheme = 'https://';
-        // var appUrl = scheme + smHost + '/ccp/ui/BubbleChat.html?host=' + smHost + '&wid=' + widgetId;
-        var appUrl = scheme + smHost + '/ccp/ui/BubbleChat.html?host=' + smHost + '&wid=' + widgetId+'&ccxqueueTag=Chat_Csq3';
+        var appUrl = scheme + smHost + '/ccp/ui/BubbleChat.html?host=' + smHost + '&wid=' + widgetId;
         var connectivityCheckUrlSecure = scheme + smHost + '/ccp/ui/ConnectivityCheck.html';
         var secureConnectivityCheckTimeout = 2000;
         var logPrefix = 'CISCO_BUBBLE_CHAT: ';
@@ -221,11 +211,7 @@ extensionField_ccxqueuetag: 'Chat_Csq3',
             'agentTypingText': accesibilityMessageToIndicateAgentTyping,
             'agentSentMessageText': accesibilityMessageToIndicateMessageFromAgent,
             'customerSentMessageText': accesibilityMessageToIndicateCustomerSentMessage,
-            'feedbackRatingIndicationText': accesibilityMessageToSelectRating,
-            'extensionField_ccxqueuetag': 'Chat_Csq3',
-            'ccxqueuetag':'Chat_Csq3',
-            'title': 'sdasdsa',
-            'author': 'dsasd'
+            'feedbackRatingIndicationText': accesibilityMessageToSelectRating
         };
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -235,21 +221,23 @@ extensionField_ccxqueuetag: 'Chat_Csq3',
             checkChatInProgress: function () {
                 if (typeof (Storage) !== 'undefined') {
                     if (sessionStorage.chatInProgress && JSON.parse(sessionStorage.chatInProgress)) {
-                        console.log(logPrefix + 'Chat conversation in progress detected. Trying to resume.');
+                        // console.log(logPrefix + 'Chat conversation in progress detected. Trying to resume.');
                         ciscoBubbleChat.showChatWindow();
                     } else {
-                        console.log(logPrefix + 'There is no chat conversation in progress currently');
+                        // console.log(logPrefix + 'There is no chat conversation in progress currently');
                     }
                 }
             },
             showChatWindow: function (injectedData) {
+                // console.log("injectedData", injectedData)
                 var messageEventListener;
                 if (document.getElementById(appId)) {
-                    console.log(logPrefix + 'Not loading BubbleChat as it is already loaded');
+                    // console.log(logPrefix + 'Not loading BubbleChat as it is already loaded');
                     return;
                 }
 
                 var validateInjectedData = function (data, dataLength) {
+                    console.log("INJECTED DATA", data, "DATA")
                     // browser compatible way to check whether it is an object with 10 fields and all the values are strings
                     var result = true;
                     if (data && typeof data === 'object' && data.constructor === Object) {
@@ -278,16 +266,19 @@ extensionField_ccxqueuetag: 'Chat_Csq3',
                         if (typeof injectedData.validationErrorCallback === 'function') {
                             injectedData.validationErrorCallback();
                         } else {
-                            console.log(logPrefix + 'Could not invoke validationErrorCallback as it is not a function');
+                            // console.log(logPrefix + 'Could not invoke validationErrorCallback as it is not a function');
                         }
                     }
                 }
                 appUrl += '&enableTranscriptDownload=' + enableTranscriptDownload;
 
                 var iframe = document.createElement('iframe');
-                iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms allow-popups');
+                // iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
+                // iframe.setAttribute('sandbox', 'allow-scripts  allow-same-origin allow-forms allow-popups');
                 iframe.setAttribute('id', appId);
                 iframe.setAttribute('class', appClass);
+
+                // iframe.setAttribute('onclick', "postMessage({messageType:'unmount'})");
                 document.body.appendChild(iframe);
                 var frameWindow = iframe.contentWindow ? iframe.contentWindow : iframe;
                 var frameDoc = frameWindow.document;
@@ -325,8 +316,9 @@ extensionField_ccxqueuetag: 'Chat_Csq3',
 
                 if (!messageEventListener) {
                     messageEventListener = function (event) {
-                        console.log(logPrefix + 'Received event from origin: ' + Object.keys(event.data));
-                        console.log(logPrefix + 'Received event data: ' + JSON.stringify(event.data));
+
+                        // console.log(logPrefix + 'Received event from origin: ' + event.origin);
+                        // console.log(logPrefix + 'Received event data: ' + JSON.stringify(event.data));
                         switch (event.data.messageType) {
                             case 'resize':
                                 var styleData = event.data.styles;
@@ -339,24 +331,30 @@ extensionField_ccxqueuetag: 'Chat_Csq3',
                                 }
                                 break;
                             case 'unmount':
+                                // console.log(document.getElementById(appId))
                                 document.body.removeChild(document.getElementById(appId));
+
+                                document.getElementById('response').innerHTML += `<h1 style='color:rgb(255,100,0)'> CHAT ENDED </h1>`
+                                // console.log(window.document.contentWindow)
+                                // console.log(window.document)
                                 window.removeEventListener('message', messageEventListener);
-                                console.log(logPrefix + 'Successfully unmounted BubbleChat and removed event listener for message');
+                                // console.log(logPrefix + 'Successfully unmounted BubbleChat and remasoved event listener for message');
                                 break;
                             case 'bubblechat-cert-accepted':
                                 iframe.contentWindow.location.replace(addNoCacheQueryParam(appUrl));
-                                console.log(logPrefix + 'Successfully validated certificate acceptance and loaded BubbleChat');
+                                // console.log(logPrefix + 'Successfully validated certificate acceptance and loaded BubbleChat');
                                 break;
                             case 'set-chat-in-progress':
                                 if (typeof (Storage) !== 'undefined') {
+                                    // console.log(("sessionStorage", sessionStorage))
                                     sessionStorage.chatInProgress = JSON.stringify(true);
-                                    console.log(logPrefix + 'chatInProgress flag set in parent window');
+                                    // console.log(logPrefix + 'chatInProgress flag set in parent window');
                                 }
                                 break;
                             case 'clear-chat-in-progress':
                                 if (typeof (Storage) !== 'undefined') {
                                     sessionStorage.removeItem("chatInProgress");
-                                    console.log(logPrefix + 'chatInProgress flag cleared in parent window');
+                                    // console.log(logPrefix + 'chatInProgress flag cleared in parent window');
                                 }
                                 break;
                             case 'minimize':
@@ -378,28 +376,30 @@ extensionField_ccxqueuetag: 'Chat_Csq3',
                                 }, 100);
                                 break;
                             case 'restore':
-                                document.getElementById(appId).classList.remove('minimized_chat');
+                                // document.getElementById(appId).classList.remove('minimized_chat');
                                 break;
                             case 'requestToSendAccessibilityMessage':
-                                if (injectedAccessibilityConfigMessages && validateInjectedData(injectedAccessibilityConfigMessages, 11)) {
+                                if (injectedAccessibilityConfigMessages && validateInjectedData(injectedAccessibilityConfigMessages, 7)) {
+                                    // console.log("injectedAccessibilityConfigMessages", injectedAccessibilityConfigMessages)
                                     frameWindow.postMessage({ messageType: 'accessibilityMessages', injectedAccessibilityConfigMessages: injectedAccessibilityConfigMessages }, '*');
-                                    console.log(logPrefix + 'Successfully sent accessibility config messages to BubbleChat');
+                                    // console.log(logPrefix + 'Successfully sent accessibility config messages to BubbleChat');
                                 } else {
-                                    console.log(logPrefix + 'Error in validating accessibility config messages, will not be passed to BubbleChat');
+                                    // console.log(logPrefix + 'Error in validating accessibility config messages, will not be passed to BubbleChat');
                                 }
                                 break;
                             default:
-                                console.log(logPrefix + 'Unknown message type');
+                            // console.log(logPrefix + 'Unknown message type');
                         }
                     };
                 }
 
                 window.addEventListener('message', messageEventListener);
-                console.log(logPrefix + 'Event listener for message added');
+                // console.log(messageEventListener, "messageEventListener")
+                // console.log(logPrefix + 'Event listener for message added');
 
                 function constructTranscriptFileName(customerName) {
                     const dateTime = new Date().toLocaleString();
-                    const dtTransformed = dateTime.replace(/ +/g, '').replace(/\W+/g, '_').replace(/^_/g, '');
+                    const dtTransformed = dateTime.replace(/ +/g, '').replace(/\W+/g, '').replace(/^/g, '');
                     const userName = customerName.replace(/ +/g, '_');
                     const fileName = 'ChatTranscript_' + userName + '-' + dtTransformed + '.html';
                     return fileName;
@@ -412,7 +412,7 @@ extensionField_ccxqueuetag: 'Chat_Csq3',
                 var xhrSecureConnectivityCheck = new XMLHttpRequest();
                 xhrSecureConnectivityCheck.onreadystatechange = function () {
                     if (this.readyState === 4) {
-                        console.log(logPrefix + 'Secure connectivity check status: ' + this.status);
+                        // console.log(logPrefix + 'Secure connectivity check status: ' + this.status);
                         switch (this.status) {
                             case 200:
                                 iframe.contentWindow.location.replace(addNoCacheQueryParam(appUrl));
@@ -422,18 +422,38 @@ extensionField_ccxqueuetag: 'Chat_Csq3',
                         }
                     }
                 }
-                const secret_data = {
-                    'csqueuetag': 'Chat_Csq3',
-                    'extensionField_ccxqueuetag': 'Chat_Csq3',
-                    'title': 'adasdas',
-                    'author': 'adsasd',
-                }
-                console.log(logPrefix + 'Checking secure connectivity to: ' + connectivityCheckUrlSecure);
+                // var iframe = document.getElementById(appId);
+                // console.log("first", iframe, "iframe")
+                // console.log("iframe", dataOfIframe, "iframe")
+                // console.log(logPrefix + 'Checking secure connectivity to: ' + connectivityCheckUrlSecure);
                 xhrSecureConnectivityCheck.open('HEAD', addNoCacheQueryParam(connectivityCheckUrlSecure), true);
                 xhrSecureConnectivityCheck.timeout = secureConnectivityCheckTimeout;
-                xhrSecureConnectivityCheck.ontimeout = function () { console.log(logPrefix + 'Secure Connectivity check timed out'); }
-                xhrSecureConnectivityCheck.send(JSON.stringify(secret_data));
+                // xhrSecureConnectivityCheck.ontimeout = function () { console.log(logPrefix + 'Secure Connectivity check timed out'); }
+                xhrSecureConnectivityCheck.send();
             }
         };
     })();
-</script>
+
+
+
+
+
+
+
+    // for o auth
+// let GoogleAuth; // Google Auth object.
+
+// function initClient() {
+//   gapi.client.init({
+//       'apiKey': 'AIzaSyCHrpQBF4OjmN4nurbuQVCVvhaDXsDtrRA',
+//       'clientId': '149808242826-5ed7fspcd4djt5lsa12g28gdgi557v3p.apps.googleusercontent.com',
+//       'scope': 'https://www.googleapis.com/auth/drive.metadata.readonly',
+//       'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest']
+//   }).then(function () {
+//       GoogleAuth = gapi.auth2.getAuthInstance();
+
+//       // Listen for sign-in state changes.
+//       GoogleAuth.isSignedIn.listen(updateSigninStatus);
+//   });
+// }
+// initClient()

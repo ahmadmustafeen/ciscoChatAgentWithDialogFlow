@@ -6,10 +6,60 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+<script src="https://apis.google.com/js/platform.js?onload=init"  ></script>
+
+    <script>
+        function Google_signIn(googleUser) {
+            var profile = googleUser.getBasicProfile();
+           
+            console.log('ID: ' + profile.getId());
+            console.log('Name: ' + profile.getName());
+            console.log('Image URL: ' + profile.getImageUrl());
+            console.log('Email: ' + profile.getEmail());
+    
+            // sessionStorage.setItem("loggedUser", profile.getEmail().toString());
+            // document.location.href = 'home.html';
+        }
+        </script>
+    
+<meta name="google-signin-client_id" 
+content='149808242826-5ed7fspcd4djt5lsa12g28gdgi557v3p.apps.googleusercontent.com'>
+<meta name="google-signin-return_url" 
+content='149808242826-5ed7fspcd4djt5lsa12g28gdgi557v3p.apps.googleusercontent.com'>
+
+    <link rel="stylesheet" href="./style.css" />
 </head>
 
 <body>
 
+
+    <div class="container">
+        <div class="container-header">
+            <h1>Mass Communication</h1>
+            <div class="g-signin2" data-onsuccess="Google_signIn" data-onfailure="console.log('asdsa')"></div>
+
+        </div>
+        <div class="container-chat-form" id="chatbox">
+            <div id="chat" class="container-chat-form-data">
+               <div class="starter">
+                <p><span style="font-size: 20px;">Welcome to Mass Communication</span> <br>Write something to begin the Chat</p>
+               </div>
+            </div>
+            <div class="container-chat-form-inputArea" >
+                <input type="text" id="query">
+                <button type="submit" onclick="onQuerySubmit(document.getElementById('query').value)">Send</button>
+            </div>
+        </div>
+        <div class="button-container">
+            <a onclick="openChat()">
+                OpenChat
+            </a>
+        </div>
+    </div>
 </body>
 
 </html>
+
+<script src="./srcipt.js" ></script>
+
+<!-- <script src="https://apis.google.com/js/platform.js" async defer></script> -->
