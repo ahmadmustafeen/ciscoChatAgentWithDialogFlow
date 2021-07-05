@@ -2,109 +2,134 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="./style.css" />
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+<script src="https://apis.google.com/js/platform.js?onload=init"  ></script>
+    <script>
+        var token = ""
+        
+        function Google_signIn(googleUser) {
+            token=  googleUser.mc.access_token
+          
+            // sessionStorage.setItem("loggedUser", profile.getEmail().toString());
+            // document.location.href = 'home.html';
+        }
+        </script>
+    
+<meta name="google-signin-client_id" 
+content='149808242826-5ed7fspcd4djt5lsa12g28gdgi557v3p.apps.googleusercontent.com'>
+
+    <link rel="stylesheet" href="./style.css" />
 </head>
 
 <body>
-    <div class="chatBox">
 
-        <div id="oldChat">
+
+    <div class="container">
+        <div class="container-header">
+            <h1>Mass Communication</h1>
+           
         </div>
-        <input name="userQuery" id="userQuery" />
-        <button onclick="sendMessage()">Sent</button>
+        <div class="generate-token">
+            <p>In Order to generate-token,Login from here</p>
+            <div class="g-signin2" data-onsuccess="Google_signIn" data-onfailure="console.log('asdsa')"></div>
+
+        </div>
+       
+        <div class="container-chat-form" id="chatbox">
+            <div id="chat" class="container-chat-form-data">
+               <div class="starter">
+                <p><span style="font-size: 20px;">Welcome to Mass Communication</span> <br>Write something to begin the Chat</p>
+               </div>
+            </div>
+            <div class="container-chat-form-inputArea" >
+                <input type="text" id="query">
+                <button type="submit" onclick="onQuerySubmit(document.getElementById('query').value)">Send</button>
+            </div>
+        </div>
+        <div class="button-container" onclick="openChat()">
+            <a id="btn-chat">
+                Chat
+            </a>
+        </div>
     </div>
-
-
-
-
 </body>
 
 </html>
-<!-- this is cdn of axios -->
-<!-- <script src="https://unpkg.com/axios/dist/axios.min.js"></script> -->
 
-<!-- comment this line and use cdn in server -->
-<script src="./node_modules/axios/dist/axios.min.js"></script>
+<script src="./srcipt.js" ></script>
 
+
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 <script>
-    const sendMessage = props => {
-        const url = "https://dialogflow.googleapis.com/v2/projects/cisco-bot-ufmj/agent/sessions/5435:detectIntent";
-        const token = "ya29.a0AfH6SMAfdO5AZ80IC7_URkkUPhuG4Xnd5II5dhLrmCv5bjZqwnp5oq2hItOueGpd8ijIfC3pHSGXCRBfufyDEdIzKifkQU-iCHP4DsI6CmlgYI_udVA1UQwjopH0MjETF87JzyIbJge1Or_M7Yg6-DAXJuDT"
+    var OAUTHURL    =   'https://accounts.google.com/o/oauth2/auth?';
+    var VALIDURL    =   'https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=';
+    var SCOPE       =   'https://www.googleapis.com/auth/userinfo.profile';
+    var CLIENTID    =   '149808242826-5ed7fspcd4djt5lsa12g28gdgi557v3p.apps.googleusercontent.com';
+    var REDIRECT    =   'http://localhost:5501'
+    var TYPE        =   'token';
+    var _url        =   OAUTHURL + 'scope=' + SCOPE + '&client_id=' + CLIENTID + '&redirect_uri=' + REDIRECT + '&response_type=' + TYPE;
+    var acToken;
+    var tokenType;
+    var expiresIn;
+    var user;
 
-        const message = document.getElementById('userQuery').value;
-        const data = {
-            query_input: {
-                text: {
-                    text: message,
-                    language_code: "en-US"
-                }
+    function login() {
+        var win         =   window.open(_url, "windowname1", 'width=800, height=600'); 
+
+        var pollTimer   =   window.setInterval(function() { 
+            if (win.document.URL.indexOf(REDIRECT) != -1) {
+                window.clearInterval(pollTimer);
+                var url =   win.document.URL;
+                acToken =   gup(url, 'access_token');
+                tokenType = gup(url, 'token_type');
+                expiresIn = gup(url, 'expires_in');
+                win.close();
+
+                validateToken(acToken);
             }
-        }
-        // var xhr = new XMLHttpRequest();
-        // xhr.open("POST", "https://dialogflow.googleapis.com/v2/projects/cisco-bot-ufmj/agent/sessions/5435:detectIntent", true);
-        // xhr.setRequestHeader('Content-Type', 'application/json', 'bearer-token', 'ya29.a0AfH6SMAfdO5AZ80IC7_URkkUPhuG4Xnd5II5dhLrmCv5bjZqwnp5oq2hItOueGpd8ijIfC3pHSGXCRBfufyDEdIzKifkQU-iCHP4DsI6CmlgYI_udVA1UQwjopH0MjETF87JzyIbJge1Or_M7Yg6-DAXJuDT');
-        // xhr.send(JSON.stringify(
-
-        //     {
-        //         "query_input": {
-        //             "text": {
-        //                 "text": message,
-        //                 "language_code": "en-US"
-        //             }
-        //         }
-        //     }
-
-        // ));
-
-
-        fetch(url, {
-            method: 'POST',
-            body: JSON.stringify({
-                "query_input": {
-                    "text": {
-                        "text": message,
-                        "language_code": "en-US"
-                    }
-                }
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': token
-            }
-        }).catch(sss => { console.log(sss); alert("Not Working" + sss) })
-
-        const options = {
-            headers:
-                // { 'Authorization': 'Bearer ' + token },
-                // { 'Access-Control-Allow-Origin': '*' },
-                { 'crossDomain': true }
-
-        };
-
-        // axios.post(url, data, options).then(s => console.log(s)).catch(e => console.log("error:" + e))
-
-
-
+        }, 100);
+    }
+    function validateToken(token) {
+        $.ajax({
+            url: VALIDURL + token,
+            data: null,
+            success: function(responseText){  
+                getUserInfo();
+            },  
+            dataType: "jsonp"  
+        });
     }
 
-    function getAuthToken() {
-        // POST Request (To get Access Token)
-        var url = "https://dialogflow.googleapis.com/v2/projects/cisco-bot-ufmj/agent/sessions/5435:detectIntent"
-
-        var postOptions = {
-            'method': 'POST',
-            'headers': {
-                'Content-Type': 'application/json; charset=utf-8',
-                'Authorization': 'ya29.a0AfH6SMAxYaE_RVRoAEQu6VVAynR0noknSCm6Nb0q-dkj4nVv94mJiRfmpL1QRLh6LRNo1YWfIuHlK_52jeY5QIhWqu09GLueFLeCtDGpjlKWQbE5XfKS4Uonejm6pm4kNyAZLn2kE-hx2ngkcgFpKREeFjLjRw'
-                // 'Authorization': 'client_id:111793231984721478121, client_secret:MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC5nZYmtnv3NrWK\nwUasjpE/uQvu+MhPx2W3Vlb8IeTRFp/UExQkgUmniu73K7EeoctR4QgkZp7aQgRm\n+p8oAvDCDSoAJLI2jZAOvyTF1ogKdoP9S1znqkhs8jc6u5rsnNs+uLM+OFKQZAS7\nJqiBaHOlZ8Jg4EtHlKb0rYCsyvhdwaZorKGP7Z+UouXdqvXF+sxNAXbDVpqdTRFl\n3ixhvV2htRkDQzxsWPDjf9/tDx/YZnd5cnDx+fIs+yaJzMZRst232q+6AS0h8ULy\nuUqG0ep1WCOgEzEASgDa2Np4d1bblxuNaXWj5JuLUbJoX4INwDgvz715I0Bt7tyi\nITv9MasHAgMBAAECggEAEm+2Ics/Xes3tfwDlpEkmTU6m7ZnQxFVp5OyWSHOtfvu\nzSRF/GhBFhylJrTWx2mfpdbZta/huGEVSds74sAEBOpE0TXT47pE5EoVD3eDFLL3\n4jlRlYsi3Xtjg/htZ3IfDshOuW/jt4bPt30cAJqM3hGDy5aLs6Tuvl/bZ45ThBBU\nDxpAxQiyvBG3okpGHiTyRXbTWlr9NqCOTWPfBO0ljSmglZrXfBQpQM+2JGr5wFSN\n5agHBWqTvgjvxkGmqJqtUkGnblewhHMtQlVsmInpgR/Us0srINbL+ozIVVbZjCHL\nMTuMJt0PNokRTSnBNyesGSlq9F4QpZKaEA8pDQfPtQKBgQDtPLsdlQp2Z94fC3D2\nmWTke3pCS9h5pEchpqVKfWCCUgx5dTMqbMpw/GBFX6MHKgzKeVu7M0joGh0TkVY7\nY49r//Hq3WhgHQQ5hAg+RaYwMBERg6tQqPyj0e9IuEFWMcTgemSGdxOUE+qsLAxS\njf+griOIiF6DLCsBUGplzGWYUwKBgQDIS7AUiQlbSWudMXDwvou0Fk63/UAgegFv\nsy5nv/qFIhxfe12ZqQ0FiZrbVru1Ic2BQqIZFmMgRPudxKIApV67mNd/O69mWasT\nt01MH5DB4QUCD4L5zhe/fw98O+1KikR2nVLJcbWYcTKHb5XtsElSg3spSdf9RqvS\nkATvoLU7/QKBgD1PaagugWKyWzQ4t7vzTqDBzInfohVlwEBRGfyTRGLJo5GsGUoI\njZT/lD25hp9uXZniHTPXACuDvCn3cIquoz0tCy9Agx37wcC/f4XgaB+h/HdDSP3y\nfkA0HBv2CmSlPhUpbFtX4MZvE0HlrFWVfw/ekS5S1+Icgwy25JhkZ4kjAoGAYobI\n0PEwBxWwuByP//zbX/TxOBR9rPwXJMkxdJu9Miw7ZMScoG/GFglAgdDCeTFtk74h\nWtHmZQNJ+qu1PTgbx5BBwTas614Eh6hNf7qvTI/SFNdoiFVW3T41cdlQurAVSXvO\nM4WZ3KkiP/kl+UwUZWCD/yVx+AcBkoyBwRZ+0EkCgYB1RQf2fB1oCW+RSG2puB7K\nGnVi2wWawBMi5QsqM0gEfykGzXQY1X7Nxv3KCxwrba0xALc1DWyP2yNlT4meYSqr\nKlqya7fWC+NU+W9MkHdRm8Swlu3yUn8g6cn3Ei2/cn8iz4OrsNd3l2k40O+bojpi\ne1upNjigzU7vJpsXOUK9+g=='
+    function getUserInfo() {
+        $.ajax({
+            url: 'https://www.googleapis.com/oauth2/v1/userinfo?access_token=' + acToken,
+            data: null,
+            success: function(resp) {
+                user    =   resp;
+                console.log(user);
+                $('#uName').append(user.name);
+                $('#imgHolder').attr('src', user.picture);
             },
-            'redirect': 'follow'
-        };
-        var authToken = fetch(url, postOptions);
+            dataType: "jsonp"
+        });
     }
-    getAuthToken()
-</script>
+
+    //credits: http://www.netlobo.com/url_query_string_javascript.html
+    function gup(url, name) {
+        name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+        var regexS = "[\\#&]"+name+"=([^&#]*)";
+        var regex = new RegExp( regexS );
+        var results = regex.exec( url );
+        if( results == null )
+            return "";
+        else
+            return results[1];
+    }
+// login()
+    </script>
+
+
+<!-- <script src="https://apis.google.com/js/platform.js" async defer></script> -->
